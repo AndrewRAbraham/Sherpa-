@@ -1,42 +1,30 @@
 package com.example.andrewabraham.localTours;
 
-import android.content.Context;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
-
-import java.io.File;
-import java.util.UUID;
+import com.parse.ParseClassName;
+import com.parse.ParseObject;
 
 /**
  * Created by Andrew Abraham on 9/16/2015.
  */
-public class TourEvent {
-    private String mName;
+@ParseClassName("TourEvent")
+public class TourEvent extends ParseObject {
+    private String mTitle;
     private ImageView mImage;
     private String mDescription;
     private long mStars;
-    private UUID mUUID;
-    private String locations;
+    private String mLocations;
+    private String mAuthor;
+    private String mId;
+    private long mRating;
 
-    public TourEvent(){
-        UUID uuid = UUID.randomUUID();
-        setUUID(uuid);
-    }
-    public String getLocations() {
-        return locations;
+    public String getTitle() {
+        return mTitle;
     }
 
-    public void setLocations(String locations) {
-        this.locations = locations;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    public void setName(String name) {
-        mName = name;
+    public void setTitle(String title) {
+        mTitle = title;
     }
 
     public ImageView getImage() {
@@ -63,17 +51,38 @@ public class TourEvent {
         mStars = stars;
     }
 
-    public UUID getUUID() {
-        return mUUID;
+    public String getLocations() {
+        return mLocations;
     }
 
-    public void setUUID(UUID UUID) {
-        mUUID = UUID;
+    public void setLocations(String locations) {
+        mLocations = locations;
     }
 
-    public void setImagePicasso(ImageView imageView, Context context){
-        File file = new File("file:///android_asset/Image.jpg");
-        Picasso.with(context).load(file).into(imageView);
-
+    public String getAuthor() {
+        return mAuthor;
     }
+
+    public void setAuthor(String author) {
+        mAuthor = author;
+    }
+
+    public String getId() {
+        return mId;
+    }
+
+    public void setId(String id) {
+        mId = id;
+    }
+
+    public long getRating() {
+        return mRating;
+    }
+
+    public void setRating(long rating) {
+        mRating = rating;
+    }
+
+
+
 }

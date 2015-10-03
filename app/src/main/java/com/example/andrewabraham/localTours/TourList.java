@@ -12,7 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,7 @@ public class TourList extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new DownloadTask().execute();
     }
 
     @Nullable
@@ -50,9 +53,8 @@ public class TourList extends Fragment {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.tour_fragment_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
-        new AsyncHttpTask().execute();
-
-
+        mAdapter = new TourAdapter(mTourList);
+        mRecyclerView.setAdapter(mAdapter);
         return view;
 
     }
@@ -60,33 +62,10 @@ public class TourList extends Fragment {
 
 
 
-public class AsyncHttpTask extends AsyncTask<String, Void, Integer> {
-    private Integer result =0;
-
-    @Override
-    protected Integer doInBackground(String... params) {
-        TourController controller = TourController.getTourController();
-        String url = controller.buildURI();
-        result = controller.getDataFromDataBase(url);
-        mTourList = controller.getTourList();
-        return result;
-    }
-
-    @Override
-    protected void onPostExecute(Integer result) {
-        if (result == 1) {
-            mAdapter = new TourAdapter(mTourList);
-            mRecyclerView.setAdapter(mAdapter);
-        } else {
-            Toast.makeText(getActivity(), "Failed to fetch data!", Toast.LENGTH_SHORT).show();
-        }
-    }
-}
 
 
 
-
-    public static class TourViewHolder extends RecyclerView.ViewHolder{
+    public class TourViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         CardView mCardView;
         TextView mTitleTextView;
         ImageView mImageView;
@@ -98,10 +77,19 @@ public class AsyncHttpTask extends AsyncTask<String, Void, Integer> {
             mTitleTextView = (TextView) itemView.findViewById(R.id.tour_title_text);
             mImageView = (ImageView) itemView.findViewById(R.id.tour_image);
             mDescriptionTextView = (TextView) itemView.findViewById(R.id.tour_description);
+            mCardView.setOnClickListener(this);
         }
 
 
+        @Override
+        public void onClick(View v) {
+           int i = getAdapterPosition();
+            TourEvent event = (TourEvent) mTourList.get(i);
+            String id = event.getId();
 
+
+
+        }
     }
 
 
@@ -115,6 +103,7 @@ public class AsyncHttpTask extends AsyncTask<String, Void, Integer> {
             mTourListData = list;
         }
 
+
         @Override
         public TourViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
@@ -127,7 +116,7 @@ public class AsyncHttpTask extends AsyncTask<String, Void, Integer> {
         @Override
         public void onBindViewHolder(TourViewHolder tourViewHolder, int i) {
             TourEvent tourEvent = (TourEvent) mTourListData.get(i);
-            tourViewHolder.mTitleTextView.setText(tourEvent.getName());
+            tourViewHolder.mTitleTextView.setText(tourEvent.getTitle());
             tourViewHolder.mDescriptionTextView.setText(tourEvent.getDescription());
 
 
@@ -138,6 +127,55 @@ public class AsyncHttpTask extends AsyncTask<String, Void, Integer> {
 
             return mTourListData.size();
         }
+    }
+
+    private class DownloadTask extends AsyncTask<Void, Void, List> {
+
+
+        @Override
+        protected List doInBackground(Void... params) {
+            ParseQuery<TourEvent> query = new ParseQuery<TourEvent>("TourEvent");
+            List<TourEvent> list = new ArrayList<>();
+            try {
+                list = query.find();
+                if (list != null){
+                    for ( TourEvent tour : list) {
+                        TourEvent tourEvent = new TourEvent();
+                        tourEvent.setTitle(tour.getString("title"));
+                        tourEvent.setDescription(tour.getString("description"));
+                        tourEvent.setLocations(tour.getString("locations"));
+                        tourEvent.setRating(tour.getLong("rating"));
+                        tourEvent.setAuthor(tour.getString("author"));
+                        tourEvent.setId(tour.getString("objectId"));
+
+                        mTourList.add(tourEvent);
+                    }
+                }
+
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            finally {
+                if (list == null ){
+                    return null;
+
+                }else{
+                    return mTourList;
+                }
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(List list) {
+            super.onPostExecute(list);
+            updateUI(list);
+        }
+    }
+
+    private void updateUI(List list) {
+        mAdapter.notifyDataSetChanged();
     }
 
 }

@@ -7,15 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.parse.Parse;
-
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, "79Huv0P0NWQ0bUJh6sUP4adeWs2LjJzi5J2v1Y85", "5G5nKIvjbiW6en2spU1ptK3k6tqnZbU5fxv5RaQa");
+
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
