@@ -5,16 +5,18 @@
               android:layout_height="fill_parent">
     <FrameLayout
         android:orientation ="vertical"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:id="@+id/gps_holder">
     </FrameLayout>
 
     <FrameLayout
         android:orientation ="vertical"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:id="@+id/gps_info_holder">
     </FrameLayout>
 
 </LinearLayout>

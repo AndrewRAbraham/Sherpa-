@@ -1,23 +1,26 @@
 package com.example.andrewabraham.localTours;
 
-import android.widget.ImageView;
-
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Andrew Abraham on 9/16/2015.
  */
 @ParseClassName("TourEvent")
-public class TourEvent extends ParseObject {
+public class TourEvent extends ParseObject implements Serializable{
     private String mTitle;
-    private ImageView mImage;
+    private String mImage;
     private String mDescription;
     private long mStars;
     private String mLocations;
     private String mAuthor;
     private String mId;
     private long mRating;
+    private List mNames;
+    private List mStops;
 
     public String getTitle() {
         return mTitle;
@@ -27,11 +30,11 @@ public class TourEvent extends ParseObject {
         mTitle = title;
     }
 
-    public ImageView getImage() {
+    public String getImageLocation() {
         return mImage;
     }
 
-    public void setImage(ImageView image) {
+    public void setImageLocation(String image) {
         mImage = image;
     }
 
@@ -83,6 +86,19 @@ public class TourEvent extends ParseObject {
         mRating = rating;
     }
 
+    public List getNames() {
+        return mNames;
+    }
 
+    public void setNames(List names) {
+        mNames = names;
+    }
 
+    public List getStops() {
+        return mStops;
+    }
+
+    public void setStops(List stops) {
+        mStops = stops;
+    }
 }

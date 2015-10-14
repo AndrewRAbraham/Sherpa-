@@ -4,7 +4,8 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:weightSum="1">
+              android:weightSum="1"
+              android:scrollIndicators="right">
 
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -19,6 +20,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             >
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                android:id="@+id/tour_image"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="4dp"
+                android:foregroundGravity="bottom"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -28,16 +39,18 @@
                 android:layout_centerVertical="true"
                 android:layout_alignLeft="@+id/tour_image"
                 android:layout_alignStart="@+id/tour_image"
-                android:layout_alignBottom="@+id/tour_image"/>
+                android:layout_alignBottom="@+id/tour_image"
+                android:foregroundGravity="top"
+                android:textColor="#ffffff"
+                android:shadowColor="#000000"
+                android:shadowDx="0.0"
+                android:shadowDy="0.0"
+                android:shadowRadius="2.0"
+                android:textColorHighlight="#999999"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"/>
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="75dp"
-                android:id="@+id/tour_image"
-                android:layout_alignParentTop="true"
-                android:contentDescription="title"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"/>
+
 
             <TextView
             android:layout_width="match_parent"

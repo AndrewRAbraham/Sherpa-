@@ -11,7 +11,7 @@ import java.util.List;
  * Created by Andrew Abraham on 9/16/2015.
  */
 public class TourController {
-    private ArrayList<TourEvent> mTourList = new ArrayList<>();
+    private List<TourEvent> mTourList = new ArrayList<>();
     public ImageView mImageView;
     public static TourController controller;
     private final String LOG_TAG = "download not sucessful";
@@ -36,7 +36,7 @@ public class TourController {
         return mTourList;
     }
 
-    public void setTourList(ArrayList tourList) {
+    public void setTourList(List tourList) {
         mTourList = tourList;
     }
 

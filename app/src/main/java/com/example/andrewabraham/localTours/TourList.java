@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,8 @@ public class TourList extends Fragment {
     private final String LOG_TAG = "download not sucessful";
     private List mTourList = new ArrayList();
     private RecyclerView mRecyclerView;
+    private TourController mTourController = TourController.getTourController();
+    public static final String tourKey = "event";
 
      public static TourList newInstance() {
 
@@ -65,7 +69,7 @@ public class TourList extends Fragment {
 
 
 
-    public class TourViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class TourViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener{
         CardView mCardView;
         TextView mTitleTextView;
         ImageView mImageView;
@@ -74,20 +78,26 @@ public class TourList extends Fragment {
         public TourViewHolder(View itemView) {
             super(itemView);
             mCardView = (CardView) itemView.findViewById(R.id.card_view);
+            mCardView.setOnClickListener(this);
             mTitleTextView = (TextView) itemView.findViewById(R.id.tour_title_text);
             mImageView = (ImageView) itemView.findViewById(R.id.tour_image);
             mDescriptionTextView = (TextView) itemView.findViewById(R.id.tour_description);
-            mCardView.setOnClickListener(this);
         }
-
 
         @Override
         public void onClick(View v) {
-           int i = getAdapterPosition();
-            TourEvent event = (TourEvent) mTourList.get(i);
-            String id = event.getId();
+            List list = mTourController.getTourList();
+            int i = this.getAdapterPosition();
+            TourEvent event = (TourEvent)list.get(i);
 
-
+            DetailViewFragment fragment = new DetailViewFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(tourKey, event);
+            fragment.setArguments(bundle);
+            FragmentManager manager = getActivity().getSupportFragmentManager();
+            manager.beginTransaction()
+                    .replace(R.id.fragment_holder, fragment).addToBackStack("fragment 1")
+                    .commit();
 
         }
     }
@@ -95,12 +105,15 @@ public class TourList extends Fragment {
 
 
 
-    public class TourAdapter extends RecyclerView.Adapter<TourViewHolder> {
+    public class TourAdapter extends RecyclerView.Adapter<TourViewHolder>
+    {
 
         private List mTourListData = new ArrayList();
 
         public TourAdapter(List list) {
             mTourListData = list;
+
+
         }
 
 
@@ -118,16 +131,26 @@ public class TourList extends Fragment {
             TourEvent tourEvent = (TourEvent) mTourListData.get(i);
             tourViewHolder.mTitleTextView.setText(tourEvent.getTitle());
             tourViewHolder.mDescriptionTextView.setText(tourEvent.getDescription());
-
+            if (tourEvent.getImageLocation() != null) {
+                Picasso.with(getContext()).load(tourEvent.getImageLocation()).fit().into(tourViewHolder.mImageView);
+            }else{
+                Picasso.with(getContext()).cancelRequest(tourViewHolder.mImageView);
+            }
 
         }
 
         @Override
         public int getItemCount() {
-
             return mTourListData.size();
         }
+
+        @Override
+        public void onViewRecycled(TourViewHolder holder) {
+            super.onViewRecycled(holder);
+            holder.mImageView.setImageBitmap(null);
+        }
     }
+
 
     private class DownloadTask extends AsyncTask<Void, Void, List> {
 
@@ -138,16 +161,20 @@ public class TourList extends Fragment {
             List<TourEvent> list = new ArrayList<>();
             try {
                 list = query.find();
-                if (list != null){
-                    for ( TourEvent tour : list) {
+                if (list != null) {
+                    for (TourEvent tour : list) {
                         TourEvent tourEvent = new TourEvent();
                         tourEvent.setTitle(tour.getString("title"));
                         tourEvent.setDescription(tour.getString("description"));
                         tourEvent.setLocations(tour.getString("locations"));
+                        tourEvent.setNames(tour.getList("names"));
+                        tourEvent.setStops(tour.getList("stops"));
                         tourEvent.setRating(tour.getLong("rating"));
                         tourEvent.setAuthor(tour.getString("author"));
                         tourEvent.setId(tour.getString("objectId"));
-
+                        if (tour.get("image") != null) {
+                            tourEvent.setImageLocation(tour.getParseFile("image").getUrl());
+                        }
                         mTourList.add(tourEvent);
                     }
                 }
@@ -156,16 +183,11 @@ public class TourList extends Fragment {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            finally {
-                if (list == null ){
-                    return null;
 
-                }else{
                     return mTourList;
-                }
             }
 
-        }
+
 
         @Override
         protected void onPostExecute(List list) {
@@ -176,6 +198,7 @@ public class TourList extends Fragment {
 
     private void updateUI(List list) {
         mAdapter.notifyDataSetChanged();
+        mTourController.setTourList(list);
     }
 
 }
